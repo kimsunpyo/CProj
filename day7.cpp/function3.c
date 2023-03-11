@@ -22,7 +22,7 @@ void Swap2(T* t)
 
 int main() 
 {
-	// C언어 : 함수+구조체+포인ㄴ터
+	// C언어 : 함수+구조체+포인터
 	T t1 = { 1,2 };
 	T t2 = { 3,4 };
 	T* p_t2 = &t2;
@@ -37,5 +37,6 @@ int main()
 	printf("변경 전 %d, %d\n", p_t2->num1, p_t2->num2);
 	Swap(p_t2);			// 주소를 넘김
 	printf("변경 후 %d, %d\n", p_t2->num1, p_t2->num2);
+
 	return 0;
 }
