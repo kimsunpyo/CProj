@@ -9,7 +9,40 @@
 #define MUL 3
 #define DIV 4
 
+// DlgProc의 매개변수에 있는 값을 백업해서 다른 함수에서 사용하기 위한 전역변수
 HWND g_hDlg;
+
+void oper(int first_num, int oper) {
+    int num = GetDlgItemInt(g_hDlg, IDC_EDIT1, 0, TRUE);
+    if (oper == ADD) {
+        SetDlgItemInt(g_hDlg, IDC_EDIT1, first_num+num, TRUE);
+    }
+    else if (oper == SUB) {
+        SetDlgItemInt(g_hDlg, IDC_EDIT1, first_num - num, TRUE);
+    }
+    else if (oper == MUL) {
+        SetDlgItemInt(g_hDlg, IDC_EDIT1, first_num * num, TRUE);
+    }
+    else if (oper == DIV) {
+        if (num != 0) {
+            SetDlgItemInt(g_hDlg, IDC_EDIT1, first_num / num, TRUE);
+        }
+        else {
+            SetDlgItemInt(g_hDlg, IDC_EDIT1, 0, TRUE);
+        }
+    }   
+}
+
+void NumBtn(int number, int* p_reset_flag) {
+    if (*p_reset_flag == 0) {
+        int num = GetDlgItemInt(g_hDlg, IDC_EDIT1, 0, TRUE);
+        SetDlgItemInt(g_hDlg, IDC_EDIT1, num * 10 + number, TRUE);
+    }
+    else {
+        SetDlgItemInt(g_hDlg, IDC_EDIT1, number, TRUE);
+        *p_reset_flag = 0;
+    }
+}
 
 INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -18,6 +51,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     static int oper = 0;            // 0: 안눌림, 1: 더하기, 2: 빼기, 3: 곱하기, 4: 나누기
     static int reset_flag;              // 0: 안눌림, 1: 연산기호눌림
     static int first_num;               // 연산기호가 눌렸을때 기존의 값을 백업할 변수
+    g_hDlg = hDlg;              // 함수 안에 있는 지역변수의 값을 전역변수(멤버변수)에 백업
     switch (message)
     {
     case WM_INITDIALOG:
@@ -31,7 +65,11 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             return (INT_PTR)TRUE;
         }
         else if (key == IDOK) {
-            // 확인버튼을 누르면 동작할 코드
+            // 확인버튼을 누르면 동작할 코드 (=)
+            oper(first_num, oper);
+            oper = NONE;
+            reset_flag = 1;     // = 버튼 누르면 값을 새로 쓰겠다
+        }
             if (oper == ADD) {
                 // 화면에 있는 값을 변수로 저장해서 -> 백업한 값과 더하기 하고 화면에 보여준다
                 int num = GetDlgItemInt(hDlg, IDC_EDIT1, 0, TRUE);
@@ -54,9 +92,8 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
                     SetDlgItemInt(hDlg, IDC_EDIT1, 0, TRUE);
                 }
             }
-            oper = NONE;
-            reset_flag = 1;         // = 버튼 누르면 값을 새로 쓰겠다
-        }            
+    
+        }           
         else if (key == IDC_BUTTON0) {
             if(reset_flag ==0){
                 int num = GetDlgItemInt(hDlg, IDC_EDIT1, 0, TRUE);
